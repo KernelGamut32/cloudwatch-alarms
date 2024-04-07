@@ -1,11 +1,16 @@
 import { App, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { TopSecretBucketCreator } from './topsecret-bucket-creator';
+import { MonitoringResourcesCreator } from './monitoring-resources-creator';
+import { SnsAlarmTopicCreator } from './sns-alarm-topic-creator';
 
-export class MyStack extends Stack {
+export class CloudWatchAlarmsStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
 
-    // define resources here...
+    const bucket = new TopSecretBucketCreator(this, 'TopSecretBucket');
+    const snsTopic = new SnsAlarmTopicCreator(this, 'SnsAlarmTopic', app.node.tryGetContext('emailAddress')).topic;
+    new MonitoringResourcesCreator(this, 'MonitoringResources', snsTopic, bucket.bucket);
   }
 }
 
@@ -17,7 +22,7 @@ const devEnv = {
 
 const app = new App();
 
-new MyStack(app, 'cloudwatch-alarms-dev', { env: devEnv });
-// new MyStack(app, 'cloudwatch-alarms-prod', { env: prodEnv });
+new CloudWatchAlarmsStack(app, 'cloudwatch-alarms-dev', { env: devEnv });
+// new CloudWatchAlarmsStack(app, 'cloudwatch-alarms-prod', { env: prodEnv });
 
 app.synth();
