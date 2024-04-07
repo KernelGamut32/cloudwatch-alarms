@@ -21,7 +21,7 @@ export class MonitoringResourcesCreator extends Construct {
             logGroupName: 'aws-cloudtrail-logs',
         });
         logGroup.addMetricFilter(`MetricFilter-${id}`, {
-            filterPattern: { logPatternString: '{ ($.eventSource = s3.amazonaws.com) && (($.eventName = PutObject) || ($.eventName = GetObject)) }' },
+            filterPattern: { logPatternString: '{($.eventSource = s3.amazonaws.com) && (($.eventName = PutObject) || ($.eventName = GetObject) || ($.eventName = DeleteObject))}' },
             metricNamespace: 'MetricFilters',
             metricName: 'MetricFilters',
             metricValue: '1',
